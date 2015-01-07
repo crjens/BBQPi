@@ -20,4 +20,5 @@ Install Instructions
 		ii.	sudo ln -s /home/pi/node-v0.10.28-linux-arm-pi/bin/npm /usr/bin/npm
 	d. (both node -v and npm -v should now show current version)
 5) Create an 'app' directory on Pi and copy install.sh and package.json from the github install directory to it
-6) cd into the 'app' directory and type 'npm install' 
+6) cd into the 'app' directory and type 'npm install'
+
