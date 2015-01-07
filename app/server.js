@@ -9,19 +9,7 @@ var favicon = require('serve-favicon');
 
 var PythonShell = require('python-shell');
 
-//var options = {
-//    mode: 'text',
-//    //pythonPath: 'path/to/python',
-//    //pythonOptions: ['-u'],
-//    //scriptPath: 'path/to/my/scripts',
-//    args: ['foo', 'bar', 'blah']
-//};
 
-//PythonShell.run('shapes.py', options, function (err, results) {
-//    if (err) throw err;
-//    // results is an array consisting of messages collected during execution
-//    console.log('results: %j', results);
-//});
 
 var t = (new Date()).getTime();
 
@@ -36,37 +24,20 @@ var data = {
     probe1label: "Thigh",
     probe2label: "Leg",
     probe3label: "Breast",
-    probe4label: "Grill temp",
+    probe4label: "Grill",
 };
 
 
-var pyshell = new PythonShell('shapes.py', {
+var pyshell = new PythonShell('display.py', {
     mode: 'json'
 });
 var output = '';
 pyshell.stdout.on('data', function (data) {
     console.log('from py: ' + data);
 });
-//pyshell.send({ a: 'b' }).send(null).send([1, 2, 3]).end(function (err) {
 pyshell.send(data).end(function (err) {
     if (err) console.log(err);
-    //output.should.be.exactly('{"a": "b"}\nnull\n[1, 2, 3]\n');
-    //done();
 });
-
-//PythonShell.run('shapes.py', { mode: 'json', args: data },function (err) {
-//    if (err) console.log(err);
-//    console.log('finished');
-//});
-
-//var shell = new PythonShell('script.py', { mode: 'json ' });
-//shell.send(data);
-
-//var json = JSON.stringify(data);
-//console.log(json);
-
-//var spawn = require("child_process").spawn;
-//var process = spawn('python',["python/shapes.py", json ]);
 
 
 var app = express();
