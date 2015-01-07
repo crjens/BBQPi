@@ -1,0 +1,27 @@
+{
+    "name": "bbqpi",
+    "version": "1.0.0",
+    "description": "raspberry pi BBQ monitor",
+    "homepage": "https://github.com/crjens/bbqpi",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/crjens/bbqpi.git"
+    },
+    "scripts": {
+        "postinstall": "/bin/bash ./install.sh"
+    },
+    "keywords": [
+        "spi",
+        "raspberry",
+        "pi",
+        "raspberrypi",
+        "rpi",
+        "bbq",
+        "meter",
+        "bbqmeter",
+        "grill",
+        "smoker"
+    ],
+    "author": "Craig Jensen",
+    "license": "BSD"
+}

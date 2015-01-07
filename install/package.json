@@ -1,0 +1,17 @@
+{
+    "name": "bbqinstaller-all",
+    "version": "1.0.0",
+    "description": "raspberry pi bbq monitor dependencies",
+    "author": "Craig Jensen",
+    "license": "BSD",
+    "dependencies": {
+        "sqlite3": ">=3.0.2",
+        "twilio": ">=1.7.0",
+        "express": ">=4.9.7",
+        "serve-favicon": ">=2.1.5",
+        "basic-auth": ">=1.0.0",
+        "python-shell":  ">=0.0.3",
+        "bbqpi": "crjens/bbqpi"
+    },
+    "engines": { "node": ">=0.10.28" }   
+}
