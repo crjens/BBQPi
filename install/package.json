@@ -10,8 +10,11 @@
         "express": ">=4.9.7",
         "serve-favicon": ">=2.1.5",
         "basic-auth": ">=1.0.0",
-        "python-shell":  ">=0.0.3",
+        "python-shell": ">=0.0.3",
         "bbqpi": "crjens/bbqpi"
+    },
+    "scripts": {
+        "preinstall": "/bin/bash ./install.sh"
     },
     "engines": { "node": ">=0.10.28" }   
 }
