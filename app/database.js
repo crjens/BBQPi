@@ -1,13 +1,62 @@
 var sqlite3 = require('sqlite3');
+var TableStates = { Configuration: false, Readings: false };
+var databaseFile = 'bbq.db';
+var dbLocked = false;
 
-var sql = new sqlite3.Database('bbq.db', function () {
-    sql.run('PRAGMA foreign_keys=on');
+var sql = new sqlite3.Database(databaseFile, function (err) {
+
+    if (err) {
+        console.log("Error opening database: " + databaseFile + " : " + err);
+    } else {
+
+        console.log('opened database: ' + databaseFile);
+        sql.run('PRAGMA foreign_keys=on');
+        sql.run("create table if not exists Configuration (id INTEGER primary key, Description Text, Weight real, Food Text, P1Name Text, P2Name Text, P3Name Text, P4Name Text, P1Low real, P1High real, P2Low real, P2High real, P3Low real, P3High real, P4Low real, P4High real, Timestamp TEXT);", function (err) {
+            if (err) {
+                console.log("Error creating Configuration table: " + err);
+                TableStates.Configuration = "Error";
+            } else {
+
+                // insert first probe if none exist
+                //powerDb.run("Insert into Probes (id, Type, Board, CurrentChannel, VoltageChannel) select 1,'30A',0,0,0 where (select count(*) from Probes) = 0;");
+
+                console.log('Configuration table ready');
+                TableStates.Configuration = true;
+            }
+        });
+
+        sql.run("create table if not exists Readings (id INTEGER primary key, RunId int, T1 real, T2 real, T3 real, T4 real, Timestamp TEXT, foreign key(RunId) references Configuration(id));", function (err) {
+            if (err) {
+                console.log("Error creating Readings table: " + err);
+                TableStates.Readings = "Error";
+            } else {
+
+                sql.run("create index if not exists Readings_RunId_idx on Readings(RunId);");
+                sql.run("create index if not exists Readings_Timestamp_idx on Readings(Timestamp);");
+
+                // insert first probe if none exist
+                //powerDb.run("Insert into Probes (id, Type, Board, CurrentChannel, VoltageChannel) select 1,'30A',0,0,0 where (select count(*) from Probes) = 0;");
+
+                console.log('Readings table ready');
+                TableStates.Readings = true;
+            }
+        });
+        
+    }
 });
 
-sql.run("create table if not exists Configuration (id INTEGER primary key, Description Text, Weight real, Food Text, P1Name Text, P2Name Text, P3Name Text, P4Name Text, P1Low real, P1High real, P2Low real, P2High real, P3Low real, P3High real, P4Low real, P4High real, Timestamp TEXT);");
-sql.run("create table if not exists Readings (id INTEGER primary key, RunId int, T1 real, T2 real, T3 real, T4 real, Timestamp TEXT, foreign key(RunId) references Configuration(id));");
-sql.run("create index if not exists Readings_RunId_idx on Readings(RunId);");
-sql.run("create index if not exists Readings_Timestamp_idx on Readings(Timestamp);");
+
+var WaitForTable = function (tableName, callback) {
+    if (TableStates[tableName] == true && !dbLocked)
+        callback();
+    else if (TableStates[tableName] == "Error")
+        callback("Table " + tableName + " failed to initialize");
+    else {
+        console.log("waiting for table: " + tableName);
+        setTimeout(WaitForTable, 100, tableName, callback);
+    }
+}
+
 
 String.prototype.escape = function (str) { return (this.replace(/'/g, "''")) }
 
@@ -33,17 +82,23 @@ var db =
     },
     // return data for a given RunId
     readRunData: function (runId, callback) {
-        
-        var sqlTxt = "Select * from Readings where RunId = " + runId + ";";
 
-        sql.all(sqlTxt, function (err, results) {
-            if (err) {
-                console.log(sqlTxt);
-                console.log("select err: " + err);
-                callback(err);
-            } else {
-                callback(null, results);
-            }
+        WaitForTable("Readings", function (err) {
+
+            if (err)
+                return callback(err);
+
+            var sqlTxt = "Select * from Readings where RunId = " + runId + ";";
+
+            sql.all(sqlTxt, function (err, results) {
+                if (err) {
+                    console.log(sqlTxt);
+                    console.log("select err: " + err);
+                    callback(err);
+                } else {
+                    callback(null, results);
+                }
+            });
         });
     },
     startRun: function (description, weight, food, p1Name, p2Name, p3Name, p4Name, p1Low, p1High, p2Low, p2High, p3Low, p3High, p4Low, p4High, callback) {
@@ -93,16 +148,22 @@ var db =
     },
     getAllRuns: function (callback) {
         
-        var sqlTxt = "Select * from Configuration order by Timestamp desc;";
+        WaitForTable("Configuration", function (err) {
 
-        sql.all(sqlTxt, function (err, results) {
-            if (err) {
-                console.log(sql);
-                console.log("select err: " + err);
-                callback(err);
-            } else {
-                callback(null, results);
-            }
+            if (err)
+                return callback(err);
+
+            var sqlTxt = "Select * from Configuration order by Timestamp desc;";
+
+            sql.all(sqlTxt, function (err, results) {
+                if (err) {
+                    console.log(sql);
+                    console.log("select err: " + err);
+                    callback(err);
+                } else {
+                    callback(null, results);
+                }
+            });
         });
     },
     deleteRun: function (runId, callback) {
