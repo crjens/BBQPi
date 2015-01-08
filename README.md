@@ -12,16 +12,19 @@ Install Instructions
 3. run 'sudo raspi-config' 
 	1. set locale and timezone under internationalisation options
 	2. enable SPI and I2C under Advanced Options
-4. Install nodejs:
+4. Enable I2C by adding the following two lines to /etc/modules
+	1. i2c-bcm2708 
+	2. i2c-dev
+5. Install nodejs:
 	1.	wget http://nodejs.org/dist/v0.10.28/node-v0.10.28-linux-arm-pi.tar.gz
 	2.	tar -xvzf node-v0.10.28-linux-arm-pi.tar.gz
 	3.  create symbolic links to node and npm
 		1.	sudo ln -s /home/pi/node-v0.10.28-linux-arm-pi/bin/node /usr/bin/node
 		2.	sudo ln -s /home/pi/node-v0.10.28-linux-arm-pi/bin/npm /usr/bin/npm
 	4. (both node -v and npm -v should now show current version)
-5. Create an 'app' directory on Pi and copy install.sh and package.json from the github install directory to it
-6. cd into the 'app' directory and type 'npm install'
-7. Auto-start node server on startup
+6. Create an 'app' directory on Pi and copy install.sh and package.json from the github install directory to it
+7. cd into the 'app' directory and type 'npm install'
+8. Auto-start node server on startup
 	1. install forever
 		1. sudo npm install -g forever
 	2. copy node-server.sh from install dir to /etc/init.d on pi

@@ -73,10 +73,10 @@ def plot(temps, color):
 		lasty=y
 
 # find min and max temps
-def minmax (x):
+def minmax (list):
     # this function fails if the list length is 0 
-    minimum = maximum = x[0]
-    for i in x[1:]:
+    minimum = maximum = list[0]
+    for i in list[1:]:
         if i < minimum: 
             minimum = i 
         else: 
@@ -101,6 +101,9 @@ font2 = ImageFont.truetype('fonts/segoeui.ttf', 12)
 yrange = minmax(data["probe1"]+data["probe2"]+data["probe3"]+data["probe4"])
 xrange = minmax(data["time"])
 
+# add 5% padding to data ranges
+pad = (yrange[1]-yrange[0])*0.05;
+yrange = (yrange[0]-pad, yrange[1]+pad)
 
 # Create TFT LCD display class.
 disp = TFT.ILI9341(DC, rst=RST, spi=SPI.SpiDev(SPI_PORT, SPI_DEVICE, max_speed_hz=64000000))
@@ -143,10 +146,14 @@ for i in range(6):
 
 
 # plot probe temps
-plot(data["probe1"], (255,0,0))
-plot(data["probe2"], (0, 255,0))
-plot(data["probe3"], (0, 0, 255))
-plot(data["probe4"], (255,255,0))
+if len(data["probe1"]) > 0:
+	plot(data["probe1"], (255,0,0))
+if len(data["probe2"]) > 0:
+	plot(data["probe2"], (0, 255,0))
+if len(data["probe3"]) > 0:
+	plot(data["probe3"], (0, 0, 255))
+if len(data["probe4"]) > 0:
+	plot(data["probe4"], (255,255,0))
 
 # draw text for current probe temps
 #draw_rotated_text(disp.buffer, "%s: %3d %s" % (data["probe1label"], data["probe1"][0], data["templabel"]), (200, 310), font, fill=(255,0,0), halign='left')
@@ -154,11 +161,18 @@ plot(data["probe4"], (255,255,0))
 #draw_rotated_text(disp.buffer, "%s: %3d %s" % (data["probe3label"], data["probe3"][0], data["templabel"]), (200, 10), font, fill=(0, 0, 255), halign='right')
 #draw_rotated_text(disp.buffer, "%s: %3d %s" % (data["probe4label"], data["probe4"][0], data["templabel"]), (220, 10), font, fill=(255,255,0), halign='right')
 
-
-draw_rotated_text(disp.buffer, "%s: %3d %s" % (data["probe1label"], data["probe1"][len(data["probe1"])-1], data["templabel"]), (10, 280), font, fill=(255,0,0), halign='left')
-draw_rotated_text(disp.buffer, "%s: %3d %s" % (data["probe2label"], data["probe2"][len(data["probe2"])-1], data["templabel"]), (30, 280), font, fill=(0, 255,0), halign='left')
-draw_rotated_text(disp.buffer, "%s: %3d %s" % (data["probe3label"], data["probe3"][len(data["probe3"])-1], data["templabel"]), (50, 280), font, fill=(0, 0, 255), halign='left')
-draw_rotated_text(disp.buffer, "%s: %3d %s" % (data["probe4label"], data["probe4"][len(data["probe4"])-1], data["templabel"]), (70, 280), font, fill=(255,255,0), halign='left')
+x = 10
+if len(data["probe1"]) > 0:
+	draw_rotated_text(disp.buffer, "%s: %3d %s" % (data["probe1label"], data["probe1"][len(data["probe1"])-1], data["templabel"]), (x, 280), font, fill=(255,0,0), halign='left')
+	x = x+20
+if len(data["probe2"]) > 0:
+	draw_rotated_text(disp.buffer, "%s: %3d %s" % (data["probe2label"], data["probe2"][len(data["probe2"])-1], data["templabel"]), (x, 280), font, fill=(0, 255,0), halign='left')
+	x = x+20
+if len(data["probe3"]) > 0:
+	draw_rotated_text(disp.buffer, "%s: %3d %s" % (data["probe3label"], data["probe3"][len(data["probe3"])-1], data["templabel"]), (x, 280), font, fill=(0, 0, 255), halign='left')
+	x = x+20
+if len(data["probe4"]) > 0:
+	draw_rotated_text(disp.buffer, "%s: %3d %s" % (data["probe4label"], data["probe4"][len(data["probe4"])-1], data["templabel"]), (x, 280), font, fill=(255,255,0), halign='left')
 
 # Write buffer to display hardware, must be called to make things visible on the display!
 disp.display()

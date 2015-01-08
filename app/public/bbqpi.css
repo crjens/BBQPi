@@ -1,0 +1,118 @@
+* {	padding: 0; margin: 0; vertical-align: top; }
+
+body {
+	background: url(background.png) repeat-x;
+	font: 18px/1.5em "proxima-nova", Helvetica, Arial, sans-serif;
+    overflow-x:hidden;
+}
+
+a {	color: #069; }
+a:hover { color: #28b; }
+
+h3 {
+	margin-left: 30px;
+	font: normal 26px "omnes-pro", Helvetica, Arial, sans-serif;
+	color: #666;
+}
+
+p {
+	margin-top: 10px;
+}
+
+button {
+	font-size: 18px;
+	padding: 1px 7px;
+}
+
+input {
+	font-size: 18px;
+}
+
+#description {
+    width: 300px;
+}
+
+input[type=text] {
+    width: 80px;
+}
+
+input[type=checkbox] {
+	margin: 7px;
+}
+
+
+
+h2 {
+	margin: 10px;
+	vertical-align: middle;
+	font-size: 42px;
+	font-weight: bold;
+	text-decoration: none;
+	color: #000;
+    text-align:center;
+}
+
+#content {
+	width: 100%;
+	margin: 0 auto;
+	padding: 10px;
+}
+
+.demo-container {
+	box-sizing: border-box;
+	width: 98%;
+	height: 700px;
+	padding: 20px 15px 15px 15px;
+	margin: 15px auto 30px auto;
+	border: 1px solid #ddd;
+	background: #fff;
+	
+}
+
+.demo-placeholder {
+	width: 100%;
+	height: 43%;
+	font-size: 14px;
+	line-height: 1.2em;
+    padding:  5px;
+}
+
+.demo-table {
+    margin-top: 20px;
+	width: 100%;
+	height: 14%;
+	font-size: 14px;
+	line-height: 1.2em;
+}
+
+.demo-table table {
+    margin:  0 auto;
+}
+
+.demo-table table td {
+    padding-right: 20px;
+    padding-left: 20px;
+}
+
+
+.demo-table table td td {
+    padding-right: 5px;
+    padding-left: 5px;
+}
+
+.demo-table table tr {
+    padding: 5px;
+}
+
+.demo-table table tr tr {
+    padding: 3px;
+}
+
+.legend table {
+	border-spacing: 5px;
+}
+
+#buttons {
+    margin-top: 10px;
+    text-align: center;
+}

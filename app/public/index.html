@@ -1,0 +1,147 @@
+﻿
+<!DOCTYPE html> 
+<html lang="en"> 
+    <head> 
+        <meta charset="utf-8" /> 
+        <title>Raspberry BBQ Monitor</title> 
+        <link rel="stylesheet" href="./bbqpi.css">
+        <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/themes/smoothness/jquery-ui.css" />
+        
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
+
+        <script src="//cdnjs.cloudflare.com/ajax/libs/flot/0.8.2/jquery.flot.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/flot/0.8.2/jquery.flot.selection.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/flot/0.8.2/jquery.flot.time.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/flot/0.8.2/jquery.flot.resize.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/flot/0.8.2/jquery.flot.crosshair.min.js"></script>
+   
+        <script language="javascript" type="text/javascript" src="./index.js"></script>
+
+        <script type="text/javascript">
+
+           $(function () {
+
+                // periodically refresh graph
+                var refreshSeconds = 60;
+                setInterval(function () {
+                    var runId = $('select option:selected').val();
+                    RefreshGraph(runId);
+                }, refreshSeconds * 1000);
+
+                $('#buttonNew').click(function () {
+                    Configure(true, -1);
+                });
+
+                $('#buttonContinue').click(function () {
+                    Configure(true, $('select option:selected').val());
+                });
+
+                $('#buttonDelete').click(function () {
+                    var runId = $('select option:selected').val();
+                    var runtext = $('select option:selected').text();
+                    if (confirm('Are you sure you want to delete run :' + runtext)) {
+                        Delete(runId);
+                    }
+                });
+
+                $('#buttonStop').click(function () {
+                    StopRun();
+                }).hide();
+
+                $('#buttonConfigure').click(function () {
+                    Configure(false);
+                }).hide();
+
+                $("#runs").change(function () {
+                    var runId = $('select option:selected').val();
+                    RefreshGraph(runId);
+                });
+
+                // load intial config
+                InitializeGraph();
+
+            });
+
+	</script>
+
+    </head> 
+    <body> 
+        <div id="content">
+            <h2>Raspberry Pi BBQ Monitor</h2>
+		    <div class="demo-container">
+			    <div id="placeholder" class="demo-placeholder"></div>
+                <div class="demo-table">
+                    
+                    <div id='buttons'>
+                        <button id='buttonNew'>Start New</button><br />
+                        <button id='buttonContinue'>Continue Existing</button><br />
+                        <button id='buttonDelete'>Delete</button><br />
+                        <button id='buttonStop'>Stop</button><br />
+                        <button id='buttonConfigure'>Configure</button><br />
+                        <select id="runs" ></select>
+                    </div>
+
+                </div>
+		    </div>
+     	
+        </div>
+        <div id="newrundialog" title="New Run" >
+       
+          <table>
+             <tr>
+                <td><label for="title">Description</label></td>
+                <td><input type="text" id='description' /></td>
+            </tr>
+            <tr>
+                <td><label for="title">Weight</label></td>
+                <td><input type="text" id='weight' /></td>
+            </tr>
+            
+        </table>
+            <table>
+                <tr>
+                <td><input name="r1" type="radio" id="Radio1" Value="chicken" />Chicken</td>
+                <td><input name="r1" type="radio" id="Radio2" Value="beef" />Beef</td>
+                <td><input name="r1" type="radio" id="Radio3" Value="pork" />Pork</td>
+                <td><input name="r1" type="radio" id="Radio4" Value="fish" />Fish</td>
+                <td><input name="r1" type="radio" id="Radio5" Value="other" />Other</td>
+            </tr>
+            </table>
+        <table>
+
+          <tr>
+              <td></td>
+              <td>High Alert</td>
+              <td>Low Alert</td>
+
+          </tr>
+            <tr>
+                <td><input type="text" id='p1name' value=""/></td>
+                <td><input type="text" id='p1high' value=""/></td>
+                <td><input type="text" id='p1low' value=""/></td>
+            </tr>
+
+            <tr>
+                <td><input type="text" id='p2name' value=""/></td>
+                <td><input type="text" id='p2high' value=""/></td>
+                <td><input type="text" id='p2low' value=""/></td>
+            </tr>
+
+             <tr>
+                <td><input type="text" id='p3name' value=""/></td>
+                <td><input type="text" id='p3high' value=""/></td>
+                <td><input type="text" id='p3low' value=""/></td>
+            </tr>
+
+             <tr>
+                <td><input type="text" id='p4name' value=""/></td>
+                <td><input type="text" id='p4high' value=""/></td>
+                <td><input type="text" id='p4low' value=""/></td>
+            </tr>
+       
+        </table>
+
+    </div>
+    </body> 
+</html>
