@@ -5,14 +5,10 @@ var bodyParser = require('body-parser');
 var favicon = require('serve-favicon');
 var raspBBQ = require('./raspBBQ.js');
 var db = require('./database.js');
-//var methodOverride = require('method-override');
 //var basicAuth = require('basic-auth');
 //var netUtils = require('./utils.js');
 var PythonShell = require('python-shell');
 var path = require('path');
-//var t = (new Date()).getTime();
-
-
 
 var sendText = function (msg) {
 //    netUtils.sendText(msg);
@@ -29,8 +25,6 @@ var app = express();
   app.use(bodyParser.json());
   app.use(bodyParser.json({ type: 'application/vnd.api+json' }))
   app.use(favicon(__dirname + '/public/images/favicon.png'));
-//  app.use(express.bodyParser({ keepExtensions: true, uploadDir: options.uploadTmpPath}));
-//  app.use(methodOverride('X-HTTP-Method-Override'));
   app.use(express['static'](path.join(__dirname, 'public')));
   app.use(logErrors);
   app.use(clientErrorHandler);
@@ -265,6 +259,36 @@ var updateDisplay = function (data) {
     });
 }
 
+var getLastTemp = function (probe) {
+    var temp = 0;
+    if (probe != null && probe.length > 0) {
+        return probe[probe.length - 1];
+    }
+
+    return temp;
+}
+
+app.get('/bbqTemps', function (req, res) {
+
+    var p1=0, p2=0, p3=0, p4 = 0;
+
+    if (_rundata != null) {
+        p1 = getLastTemp(_rundata.probe1);
+        p2 = getLastTemp(_rundata.probe2);
+        p3 = getLastTemp(_rundata.probe3);
+        p4 = getLastTemp(_rundata.probe4);
+    }
+
+    res.send([{ pitProbe: p1 }, { foodProbe: p2 }, { probe3: p3 }, { probe4: p4 }]);
+});
+
+app.get('/bbqInit/:targetFood/:targetPit/:maxPit/:minPit', function (req, res) {
+
+    console.log(req.params);
+    res.send([{}]);
+
+});
+
 app.get('/settings', function (req, res, next) {
     if (_settings == null) {
         db.getLastRun(function (err, data) {
@@ -429,7 +453,7 @@ app.get('/', function (req, res) {
 
 // Express route for any other unrecognised incoming requests 
 app.get('*', function (req, res) {
-    res.send(404, 'Unrecognised API call');
+    res.status(404).send('Unrecognised API call');
 });
 
 

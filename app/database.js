@@ -88,6 +88,9 @@ var db =
             if (err)
                 return callback(err);
 
+            if (runId == null || runId =='undefined' || runId < 0)
+                return callback("Must specify a valid runId");
+
             var sqlTxt = "Select * from Readings where RunId = " + runId + ";";
 
             sql.all(sqlTxt, function (err, results) {

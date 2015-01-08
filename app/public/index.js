@@ -1,28 +1,44 @@
 
 var InitializeGraph = function () {
 
-    $.getJSON('/settings', function (settings) {
-
-        var dialog = $("#newrundialog");
-        dialog.data('settings', settings);
-
-        setButtonState(settings.running);
+    $.ajax({
+        url: "/settings",
+        type: "GET",
+        cache: false,
+        dataType: 'json',
+        success: function (settings) {
+            var dialog = $("#newrundialog");
+            dialog.data('settings', settings);
+            setButtonState(settings.running);
+        },
+        error: function (xhr, status, err) {
+            alert('failed to get settings: ' + status + ' - ' + err);
+        }
     });
 
-    $.getJSON('/runs', function (data) {
+    $.ajax({
+        url: "/runs",
+        type: "GET",
+        cache: false,
+        dataType: 'json',
+        success: function (data) {
 
-        var select = $("#runs");
-        select.empty();  // clear existing runs
+            var select = $("#runs");
+            select.empty();  // clear existing runs
 
-        if (data.length > 0) {
-            for (var i = 0; i < data.length; i++) {
-                select.append("<option value='" + data[i].id + "'>" + data[i].Description + ' - ' + data[i].Timestamp + "</option>");
+            if (data.length > 0) {
+                for (var i = 0; i < data.length; i++) {
+                    select.append("<option value='" + data[i].id + "'>" + data[i].Description + ' - ' + data[i].Timestamp + "</option>");
+                }
+
+                RefreshGraph(data[0].id);
+            } else {
+                $('#buttonContinue').hide();
+                $('#buttonDelete').hide();
             }
-
-            RefreshGraph(data[0].id);
-        } else {
-            $('#buttonContinue').hide();
-            $('#buttonDelete').hide();
+        },
+        error: function (xhr, status, err) {
+            alert('failed to get runs: ' + status + ' - ' + err);
         }
     });
 
@@ -64,34 +80,43 @@ var Delete = function (runId) {
 
 var Configure = function (startNew, runId) {
 
-    $.getJSON('/settings', function (settings) {
+    $.ajax({
+        url: "/settings",
+        type: "GET",
+        cache: false,
+        dataType: 'json',
+        success: function (settings) {
 
-        var dialog = $("#newrundialog");
-        dialog.find("#description").val(settings.description);
-        dialog.find("#weight").val(settings.weight);
-        
-        $("input[name=r1][value=" + settings.food + "]").prop('checked', true);
+            var dialog = $("#newrundialog");
+            dialog.find("#description").val(settings.description);
+            dialog.find("#weight").val(settings.weight);
 
-        dialog.find("#p1name").val(settings.p1.name);
-        dialog.find("#p1high").val(settings.p1.high);
-        dialog.find("#p1low").val(settings.p1.low);
+            $("input[name=r1][value=" + settings.food + "]").prop('checked', true);
 
-        dialog.find("#p2name").val(settings.p2.name);
-        dialog.find("#p2high").val(settings.p2.high);
-        dialog.find("#p2low").val(settings.p2.low);
+            dialog.find("#p1name").val(settings.p1.name);
+            dialog.find("#p1high").val(settings.p1.high);
+            dialog.find("#p1low").val(settings.p1.low);
 
-        dialog.find("#p3name").val(settings.p3.name);
-        dialog.find("#p3high").val(settings.p3.high);
-        dialog.find("#p3low").val(settings.p3.low);
+            dialog.find("#p2name").val(settings.p2.name);
+            dialog.find("#p2high").val(settings.p2.high);
+            dialog.find("#p2low").val(settings.p2.low);
 
-        dialog.find("#p4name").val(settings.p4.name);
-        dialog.find("#p4high").val(settings.p4.high);
-        dialog.find("#p4low").val(settings.p4.low);
+            dialog.find("#p3name").val(settings.p3.name);
+            dialog.find("#p3high").val(settings.p3.high);
+            dialog.find("#p3low").val(settings.p3.low);
 
-        dialog.data('settings', settings);
-        dialog.data("startnew", startNew);
-        dialog.data("runid", runId);
-        dialog.dialog('open');
+            dialog.find("#p4name").val(settings.p4.name);
+            dialog.find("#p4high").val(settings.p4.high);
+            dialog.find("#p4low").val(settings.p4.low);
+
+            dialog.data('settings', settings);
+            dialog.data("startnew", startNew);
+            dialog.data("runid", runId);
+            dialog.dialog('open');
+        },
+        error: function (xhr, status, err) {
+            alert('failed to get settings: ' + status + ' - ' + err);
+        }
     });
 }
 
@@ -142,121 +167,130 @@ var RefreshGraph = function (runId) {
     };
 
     var T1 = [], T2 = [], T3 = [], T4 = [];
-    $.getJSON('/readRunData?runId=' + runId, function (data) {
+    $.ajax({
+        url: '/readRunData?runId=' + runId,
+        type: "GET",
+        cache: false,
+        dataType: 'json',
+        success: function (data) {
 
-        /*if (data.length == 0) {
-            console.log('no data returned');
-            return;
-        }*/
-
-        var dialog = $("#newrundialog");
-        var settings = dialog.data('settings');
-
-        for (var i = 0; i < data.length; i++) {
-            var ts = (new Date(data[i].Timestamp)).getTime();
-            T1.push([ts, data[i].T1]);
-            T2.push([ts, data[i].T2]);
-            T3.push([ts, data[i].T3]);
-            T4.push([ts, data[i].T4]);
-        }
-
-        var data = [];
-
-        if (probeConnected(T1))
-            data.push({ data: T1, label: settings.p1.name + " = 000.0", points: { show: true, radius: 1 } });
-        if (probeConnected(T2))
-            data.push({ data: T2, label: settings.p2.name + " = 000.0", points: { show: true, radius: 1 } });
-        if (probeConnected(T3))
-            data.push({ data: T3, label: settings.p3.name + " = 000.0", points: { show: true, radius: 1 } });
-        if (probeConnected(T4))
-            data.push({ data: T4, label: settings.p4.name + " = 000.0", points: { show: true, radius: 1 } });
-
-        var placeholder = $("#placeholder");
-
-        placeholder.bind("plothover", function (event, pos, item) {
-            latestPosition = pos;
-            if (!updateLegendTimeout) {
-                updateLegendTimeout = setTimeout(updateLegend, 50);
-            }
-        });
-
-        placeholder.dblclick(function () {
-            options.xaxis.min = null;
-            options.xaxis.max = null;
-            plot = $.plot(placeholder, data, options);
-        });
-
-        placeholder.bind("plotselected", function (event, ranges) {
-
-            $("#selection").text(ranges.xaxis.from.toFixed(1) + " to " + ranges.xaxis.to.toFixed(1));
-
-            plot = $.plot(placeholder, data, $.extend(true, {}, options, {
-                xaxis: {
-                    min: ranges.xaxis.from,
-                    max: ranges.xaxis.to
-                }
-            }));
-
-        });
-
-        placeholder.bind("plotunselected", function (event) {
-            $("#selection").text("");
-        });
-
-        var plot = $.plot(placeholder, data, options);
-
-
-        var legends = $("#placeholder .legendLabel");
-
-        legends.each(function () {
-            // fix the widths so they don't jump around
-            $(this).css('width', $(this).width());
-        });
-
-        var updateLegendTimeout = null;
-        var latestPosition = null;
-
-        function updateLegend() {
-
-            updateLegendTimeout = null;
-
-            var pos = latestPosition;
-
-            var axes = plot.getAxes();
-            if (pos.x < axes.xaxis.min || pos.x > axes.xaxis.max ||
-				pos.y < axes.yaxis.min || pos.y > axes.yaxis.max) {
+            /*if (data.length == 0) {
+                console.log('no data returned');
                 return;
+            }*/
+
+            var dialog = $("#newrundialog");
+            var settings = dialog.data('settings');
+
+            for (var i = 0; i < data.length; i++) {
+                var ts = (new Date(data[i].Timestamp)).getTime();
+                T1.push([ts, data[i].T1]);
+                T2.push([ts, data[i].T2]);
+                T3.push([ts, data[i].T3]);
+                T4.push([ts, data[i].T4]);
             }
 
-            var i, j, dataset = plot.getData();
-            for (i = 0; i < dataset.length; ++i) {
+            var data = [];
 
-                var series = dataset[i];
+            if (probeConnected(T1))
+                data.push({ data: T1, label: settings.p1.name + " = 000.0", points: { show: true, radius: 1 } });
+            if (probeConnected(T2))
+                data.push({ data: T2, label: settings.p2.name + " = 000.0", points: { show: true, radius: 1 } });
+            if (probeConnected(T3))
+                data.push({ data: T3, label: settings.p3.name + " = 000.0", points: { show: true, radius: 1 } });
+            if (probeConnected(T4))
+                data.push({ data: T4, label: settings.p4.name + " = 000.0", points: { show: true, radius: 1 } });
 
-                // Find the nearest points, x-wise
+            var placeholder = $("#placeholder");
 
-                for (j = 0; j < series.data.length; ++j) {
-                    if (series.data[j][0] > pos.x) {
-                        break;
+            placeholder.bind("plothover", function (event, pos, item) {
+                latestPosition = pos;
+                if (!updateLegendTimeout) {
+                    updateLegendTimeout = setTimeout(updateLegend, 50);
+                }
+            });
+
+            placeholder.dblclick(function () {
+                options.xaxis.min = null;
+                options.xaxis.max = null;
+                plot = $.plot(placeholder, data, options);
+            });
+
+            placeholder.bind("plotselected", function (event, ranges) {
+
+                $("#selection").text(ranges.xaxis.from.toFixed(1) + " to " + ranges.xaxis.to.toFixed(1));
+
+                plot = $.plot(placeholder, data, $.extend(true, {}, options, {
+                    xaxis: {
+                        min: ranges.xaxis.from,
+                        max: ranges.xaxis.to
                     }
+                }));
+
+            });
+
+            placeholder.bind("plotunselected", function (event) {
+                $("#selection").text("");
+            });
+
+            var plot = $.plot(placeholder, data, options);
+
+
+            var legends = $("#placeholder .legendLabel");
+
+            legends.each(function () {
+                // fix the widths so they don't jump around
+                $(this).css('width', $(this).width());
+            });
+
+            var updateLegendTimeout = null;
+            var latestPosition = null;
+
+            function updateLegend() {
+
+                updateLegendTimeout = null;
+
+                var pos = latestPosition;
+
+                var axes = plot.getAxes();
+                if (pos.x < axes.xaxis.min || pos.x > axes.xaxis.max ||
+                    pos.y < axes.yaxis.min || pos.y > axes.yaxis.max) {
+                    return;
                 }
 
-                // Now Interpolate
+                var i, j, dataset = plot.getData();
+                for (i = 0; i < dataset.length; ++i) {
 
-                var y,
-					p1 = series.data[j - 1],
-					p2 = series.data[j];
+                    var series = dataset[i];
 
-                if (p1 == null) {
-                    y = p2[1];
-                } else if (p2 == null) {
-                    y = p1[1];
-                } else {
-                    y = p1[1] + (p2[1] - p1[1]) * (pos.x - p1[0]) / (p2[0] - p1[0]);
+                    // Find the nearest points, x-wise
+
+                    for (j = 0; j < series.data.length; ++j) {
+                        if (series.data[j][0] > pos.x) {
+                            break;
+                        }
+                    }
+
+                    // Now Interpolate
+
+                    var y,
+                        p1 = series.data[j - 1],
+                        p2 = series.data[j];
+
+                    if (p1 == null) {
+                        y = p2[1];
+                    } else if (p2 == null) {
+                        y = p1[1];
+                    } else {
+                        y = p1[1] + (p2[1] - p1[1]) * (pos.x - p1[0]) / (p2[0] - p1[0]);
+                    }
+
+                    legends.eq(i).text(series.label.replace(/=.*/, "= " + y.toFixed(1)));
                 }
-
-                legends.eq(i).text(series.label.replace(/=.*/, "= " + y.toFixed(1)));
             }
+        },
+        error: function (xhr, status, err) {
+            alert('Failed to read data for runId=' + runId + '  ' + status + ' - ' + err);
         }
     });
 }

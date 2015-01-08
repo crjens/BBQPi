@@ -102,8 +102,12 @@ yrange = minmax(data["probe1"]+data["probe2"]+data["probe3"]+data["probe4"])
 xrange = minmax(data["time"])
 
 # add 5% padding to data ranges
-pad = (yrange[1]-yrange[0])*0.05;
+pad = (yrange[1]-yrange[0])*0.05 + 1.0;
 yrange = (yrange[0]-pad, yrange[1]+pad)
+
+# make sure x has a range so don't hit a divde by zero errorrange
+if xrange[0]==xrange1:
+	xrange = (xrange[0]-60000, xrange[1]+60000)
 
 # Create TFT LCD display class.
 disp = TFT.ILI9341(DC, rst=RST, spi=SPI.SpiDev(SPI_PORT, SPI_DEVICE, max_speed_hz=64000000))
@@ -146,13 +150,13 @@ for i in range(6):
 
 
 # plot probe temps
-if len(data["probe1"]) > 0:
+if len(data["probe1"]) > 1:
 	plot(data["probe1"], (255,0,0))
-if len(data["probe2"]) > 0:
+if len(data["probe2"]) > 1:
 	plot(data["probe2"], (0, 255,0))
-if len(data["probe3"]) > 0:
+if len(data["probe3"]) > 1:
 	plot(data["probe3"], (0, 0, 255))
-if len(data["probe4"]) > 0:
+if len(data["probe4"]) > 1:
 	plot(data["probe4"], (255,255,0))
 
 # draw text for current probe temps

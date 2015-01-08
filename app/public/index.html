@@ -26,7 +26,8 @@
                 var refreshSeconds = 60;
                 setInterval(function () {
                     var runId = $('select option:selected').val();
-                    RefreshGraph(runId);
+                    if (runId != null && runId >=0)
+                        RefreshGraph(runId);
                 }, refreshSeconds * 1000);
 
                 $('#buttonNew').click(function () {
