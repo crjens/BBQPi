@@ -1,7 +1,6 @@
 #! /bin/sh
 # /etc/init.d/node-server
 
-
 ### BEGIN INIT INFO
 # Provides:          node-server
 # Required-Start:    $remote_fs $syslog
