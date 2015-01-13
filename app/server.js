@@ -9,6 +9,7 @@ var db = require('./database.js');
 //var netUtils = require('./utils.js');
 var PythonShell = require('python-shell');
 var path = require('path');
+var request = require('request');
 
 var sendText = function (msg) {
 //    netUtils.sendText(msg);
@@ -109,7 +110,7 @@ app.get('/readRunData', function (req, res, next) {
         }
         else {
 
-            if (runId == _currentRunId && _settings != null) {
+            if ((_currentRunId == null || runId == _currentRunId) && _settings != null) {
                 var rundata = {
                     templabel: "°F",
                     timelabel: "seconds",
@@ -211,6 +212,15 @@ var ReadProbes = function () {
                         if (err)
                             console.log('error inserting data: ' + err);
                     });
+			
+			console.log(t1.toFixed() + ':' + t2.toFixed());
+			request({
+                                uri: 'https://graph.api.smartthings.com/api/smartapps/installations/1fdbbf54-7483-4d4c-8b9e-5d93d6ec1252/updateTemps/'+t1.toFixed()+'/'+t2.toFixed()+'?access_token=f59be96f-b201-4245-a969-d2fe6028f4d6', 
+				method: 'PUT'
+			}
+				, function (error, response, body) {
+				console.log(body);
+			});
                 });
             });
         });
