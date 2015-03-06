@@ -1,27 +1,21 @@
 {
     "name": "bbqpi",
     "version": "1.0.0",
-    "description": "raspberry pi BBQ monitor",
-    "homepage": "https://github.com/crjens/bbqpi",
-    "repository": {
-        "type": "git",
-        "url": "git://github.com/crjens/bbqpi.git"
+    "description": "raspberry pi bbq monitor",
+    "author": "Craig Jensen",
+    "license": "BSD",
+    "dependencies": {
+        "sqlite3": ">=3.0.2",
+        "twilio": ">=1.7.0",
+        "express": ">=4.9.7",
+        "serve-favicon": ">=2.1.5",
+        "basic-auth": ">=1.0.0",
+        "python-shell": ">=0.0.3",
+        "i2c": ">=0.1.6",
+        "body-parser": ">=1.10.1"
     },
     "scripts": {
-        "postinstall": "/bin/bash ./install.sh"
+        "preinstall": "/bin/bash ./install.sh"
     },
-    "keywords": [
-        "spi",
-        "raspberry",
-        "pi",
-        "raspberrypi",
-        "rpi",
-        "bbq",
-        "meter",
-        "bbqmeter",
-        "grill",
-        "smoker"
-    ],
-    "author": "Craig Jensen",
-    "license": "BSD"
+    "engines": { "node": ">=0.10.28" }   
 }

@@ -74,7 +74,9 @@ def plot(temps, color):
 
 # find min and max temps
 def minmax (list):
-    # this function fails if the list length is 0 
+    if list is None or len(list) == 0:
+        return (0.0,0.0)
+
     minimum = maximum = list[0]
     for i in list[1:]:
         if i < minimum: 
@@ -106,7 +108,7 @@ pad = (yrange[1]-yrange[0])*0.05 + 1.0;
 yrange = (yrange[0]-pad, yrange[1]+pad)
 
 # make sure x has a range so don't hit a divde by zero errorrange
-if xrange[0]==xrange1:
+if xrange[0]==xrange[1]:
 	xrange = (xrange[0]-60000, xrange[1]+60000)
 
 # Create TFT LCD display class.
