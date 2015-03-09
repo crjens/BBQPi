@@ -12,6 +12,7 @@ Install Instructions
 3. run 'sudo raspi-config' 
 	1. set locale and timezone under internationalisation options
 	2. enable SPI and I2C under Advanced Options
+	3. expand filesystem
 4. Enable I2C by adding the following two lines to /etc/modules
 	1. i2c-bcm2708 
 	2. i2c-dev
